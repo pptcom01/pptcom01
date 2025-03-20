@@ -1,0 +1,1316 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ระบบการจัดการใบตั้งเบิกออนไลน์</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css"
+        integrity="sha512-NhSC1YmyruXifcj/KFRWoC561YpHpc5Jtzgvbuzx5VozKpWvQ+4nXhPdFgmx8xqexRcpAglTj9sIBWINXa8x5w=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* General Styles */
+        html {
+            box-sizing: border-box;
+            font-size: 16px;
+        }
+
+        *,
+        *:before,
+        *:after {
+            box-sizing: inherit;
+        }
+
+        body {
+            font-family: 'Sarabun', sans-serif;
+            background-color: #f0f8ff;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            margin: 0;
+            line-height: 1.5;
+        }
+
+        h1,
+        h2,
+        a {
+            font-family: "Sarabun", Helvetica, Arial, sans-serif;
+            color: #333;
+            line-height: 1.2;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1000px;
+            background: white;
+            padding: 1.875em;
+            border-radius: 0.5em;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+            border: none;
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 0.3125em;
+            margin-bottom: 0.625em;
+        }
+
+        .header img {
+            width: 9.375em;
+        }
+
+        .header .title {
+            font-size: 4.375em;
+            font-weight: bold;
+            color: #2e8b57;
+            text-align: center;
+            line-height: 1;
+        }
+
+        .company-info {
+            font-size: 1em;
+            line-height: 1.2;
+            margin-bottom: 0.625em;
+        }
+
+        .form-container,
+        .section-title {
+            font-size: 1em;
+            line-height: 1.2;
+            margin-bottom: 1.25em;
+        }
+
+        .section-title {
+            font-size: 1.125em;
+            font-weight: bold;
+            color: #2e8b57;
+            border-bottom: 2px solid #3cb371;
+            padding-bottom: 0.1875em;
+        }
+
+        .form-container {
+            display: grid;
+            grid-template-columns: 1.5fr 1fr;
+            gap: 0.625em;
+        }
+
+        .editable-input {
+            font-size: 1em;
+            padding: 0.125em;
+            border: 1px solid #ccc;
+            outline: none;
+            width: auto;
+            min-width: 6.25em;
+            max-width: 100%;
+        }
+
+        .doc-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 0.3125em;
+        }
+
+        .doc-table th,
+        .doc-table td {
+            padding: 0.375em;
+            text-align: center;
+            font-size: 1em;
+            line-height: 1.2;
+            border: 1px solid #ddd;
+            color: #333;
+        }
+
+        .doc-table th {
+            background: #3cb371;
+            color: white;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .doc-table tr:nth-child(even) {
+            background: #f9f9f9;
+        }
+
+        .total-row {
+            font-weight: bold;
+            background-color: #e3f2e3;
+            line-height: 1.2;
+        }
+
+        .signature-box {
+            display: inline-block;
+            width: 30%;
+            border-top: 1px solid #000;
+            padding-top: 0.3125em;
+            text-align: center;
+            margin-top: 1.25em;
+            font-size: 1em;
+            line-height: 1.2;
+        }
+
+        .button {
+            display: block;
+            width: 100%;
+            max-width: 18.75em;
+            margin: 0.625em auto;
+            background: #4682b4;
+            color: white;
+            padding: 0.5em;
+            border: none;
+            cursor: pointer;
+            border-radius: 0.375em;
+            font-size: 1em;
+            font-weight: bold;
+            transition: background 0.3s;
+            line-height: 1.2;
+        }
+
+        .button:hover {
+            background: #5f9ea0;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .amount-input {
+            text-align: right !important;
+            padding-right: 0.625em !important;
+            width: 100% !important;
+            border: none;
+            outline: none;
+            font-size: 1em;
+            line-height: 1.2;
+        }
+
+        .doc-table th:nth-child(3),
+        .doc-table td:nth-child(3) {
+            width: 7.5em;
+            min-width: 7.5em;
+            max-width: 7.5em;
+            text-align: right;
+            white-space: nowrap;
+            font-size: 1em;
+            line-height: 1.2;
+        }
+
+        .doc-table td:nth-child(2) {
+            text-align: left !important;
+            padding-left: 0.625em !important;
+            white-space: normal !important;
+            word-wrap: break-word !important;
+            font-size: 1em;
+        }
+
+        .signature-container {
+            display: flex;
+            justify-content: space-evenly;
+            align-items: center;
+            margin-top: 3.0em;
+            text-align: center;
+        }
+
+        .editable {
+            display: inline-block;
+            min-width: 3.125em;
+            padding: 0.125em 0.25em;
+            border-bottom: 1px dashed #aaa;
+            outline: none;
+            white-space: nowrap;
+            overflow: hidden;
+            font-size: 1em;
+        }
+
+        .editable:focus {
+            border-bottom: 1px solid #000;
+        }
+
+        .doc-table td#totalAmount {
+            text-align: right !important;
+        }
+
+        [contenteditable="true"],
+        .input-style {
+            border: none !important;
+            outline: none !important;
+            background: transparent !important;
+            font-size: 1em;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        input[type="date"] {
+            width: auto;
+            min-width: 1.25em;
+            max-width: 100%;
+            font-size: 1em;
+            padding: 0.0625em !important;
+            border: none !important;
+            outline: none !important;
+            background: transparent !important;
+        }
+
+        .center-input {
+            text-align: center;
+        }
+
+        .center-header {
+            text-align: center;
+        }
+
+        #financialSection {
+            margin-top: 20px;
+            border-top: 1px solid #ccc;
+            padding-top: 20px;
+        }
+        
+        /* 2 column layout for form controls */
+        .form-controls {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        /* Tabs navigation */
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid #ccc;
+            margin-bottom: 20px;
+        }
+        
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            background: #f0f0f0;
+            border: 1px solid #ccc;
+            border-bottom: none;
+            margin-right: 5px;
+            border-radius: 5px 5px 0 0;
+        }
+        
+        .tab.active {
+            background: #3cb371;
+            color: white;
+            font-weight: bold;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        /* Save message */
+        .save-message {
+            background-color: #dff0d8;
+            color: #3c763d;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+            display: none;
+        }
+
+        /* Print Styles */
+        @media print {
+            body {
+                background-color: #fff;
+                display: block;
+                font-size: 10px;
+                line-height: 1.2;
+            }
+
+            .container {
+                width: 100% !important;
+                max-width: none !important;
+                padding: 0.5em !important;
+                border: none !important;
+                box-shadow: none !important;
+            }
+
+            .header {
+                display: flex !important;
+                margin-bottom: 0.2em;
+            }
+
+            .header img {
+                width: 10em;
+            }
+
+            .header .title {
+                font-size: 2em;
+            }
+
+            .company-info {
+                font-size: 0.8em;
+                margin-bottom: 0.3em;
+            }
+
+            .section-title {
+                font-size: 1em;
+                margin-bottom: 0.5em;
+                padding-bottom: 0.1em;
+            }
+
+            .form-container {
+                grid-template-columns: 1fr 1fr;
+                gap: 0.3em;
+            }
+
+            .form-container p {
+                margin-bottom: 0.1em;
+            }
+
+            .editable-input {
+                font-size: 0.8em;
+                padding: 0.05em;
+            }
+
+            .doc-table {
+                margin-top: 0.1em;
+            }
+
+            .doc-table th,
+            .doc-table td {
+                padding: 0.2em;
+                font-size: 0.8em;
+            }
+
+            .signature-container {
+                margin-top: 5em;
+            }
+
+            .signature-box {
+                width: 30%;
+                margin-top: 0.3em;
+                font-size: 0.8em;
+            }
+
+            .button,
+            .doc-table button,
+            .tabs,
+            .form-controls,
+            .no-print {
+                display: none !important;
+            }
+
+            .doc-table th:last-child,
+            .doc-table td:last-child {
+                display: none;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <!-- Navigation tabs -->
+        <div class="tabs no-print">
+            <div class="tab active" data-tab="claimForm">ใบตั้งเบิก</div>
+            <div class="tab" data-tab="claimList">รายการใบตั้งเบิก</div>
+        </div>
+        
+        <!-- Success message -->
+        <div id="saveMessage" class="save-message">บันทึกข้อมูลเรียบร้อยแล้ว</div>
+        
+        <!-- Tab: Claim Form -->
+        <div id="claimForm" class="tab-content active">
+            <div class="header">
+                <img src="https://i.imgur.com/AcUUbXI.png" alt="BTC Logo">
+                <div class="title">ใบตั้งเบิก</div>
+            </div>
+            <div class="company-info">
+                <p><strong>บริษัท บุรีรัมย์ธวัชชัยก่อสร้าง จำกัด</strong></p>
+                <p>3/12 ถนนอินจันทร์ณรงค์ ต.ในเมือง อ.เมือง จ.บุรีรัมย์ 31000</p>
+                <p>เลขประจำตัวผู้เสียภาษี: 031555900114 โทรศัพท์: 044-611835</p>
+            </div>
+            <div class="section-title">ข้อมูลการตั้งเบิก</div>
+            <div class="form-container">
+                <div>
+                    <p><strong>ประเภทงาน/รายจ่าย :</strong>
+                        <select id="expenseType" class="editable-input input-style">
+                            <option value="">เลือกประเภทรายจ่าย</option>
+                            <!-- จะถูกเติมข้อมูลจาก Script -->
+                        </select>
+                    </p>
+                    <p><strong>จ่ายให้แก่ :</strong>
+                        <select id="payee" class="editable-input input-style">
+                            <option value="">เลือกผู้รับเงิน</option>
+                            <!-- จะถูกเติมข้อมูลจาก Script -->
+                        </select>
+                    </p>
+                    <p><strong>บัญชีธนาคาร :</strong>
+                        <input type="text" id="bankAccount" class="editable-input input-style" readonly>
+                    </p>
+                    <p><strong>โครงการ :</strong>
+                        <select id="project" class="editable-input input-style">
+                            <option value="">เลือกโครงการ</option>
+                            <!-- จะถูกเติมข้อมูลจาก Script -->
+                        </select>
+                    </p>
+                    <p><strong>รูปแบบการจ่าย :</strong>
+                        <select id="paymentType" class="editable-input input-style">
+                            <option value="">เลือกรูปแบบการจ่าย</option>
+                            <!-- จะถูกเติมข้อมูลจาก Script -->
+                        </select>
+                    </p>
+                </div>
+                <div>
+                    <p><strong>เลขที่เอกสาร :</strong>
+                        <input type="text" id="documentNumber" class="editable-input input-style" readonly>
+                    </p>
+                    <p><strong>วันที่เอกสาร :</strong>
+                        <input type="date" id="documentDate" class="input-style" value="<?= new Date().toISOString().split('T')[0] ?>">
+                    </p>
+                    <p><strong>เอกสารอ้างอิง :</strong>
+                        <input type="text" id="referenceDocument" class="editable-input input-style">
+                    </p>
+                    <p><strong>วันที่ครบกำหนดจ่าย :</strong>
+                        <input type="date" id="dueDate" class="input-style" value="<?= new Date().toISOString().split('T')[0] ?>">
+                    </p>
+                    <p><strong>หมายเหตุ :</strong>
+                        <input type="text" id="note" class="editable-input input-style">
+                    </p>
+                </div>
+            </div>
+
+            <div class="section-title">รายการเอกสาร</div>
+            <table class="doc-table">
+                <thead>
+                    <tr>
+                        <th style="text-align:center;">ลำดับที่</th>
+                        <th>รายการ / Description</th>
+                        <th style="text-align:right;">จำนวนเงิน (บาท)</th>
+                        <th>จัดการ</th>
+                    </tr>
+                </thead>
+                <tbody id="docBody"></tbody>
+                <tfoot>
+                    <tr class="total-row">
+                        <td colspan="2" style="text-align:right;">
+                            <span id="totalAmountText"></span> ยอดรวมสุทธิ
+                        </td>
+                        <td id="totalAmount" style="text-align:right;">0.00</td>
+                        <td></td>
+                    </tr>
+                </tfoot>
+            </table>
+            <button class="button no-print" id="addRowBtn">เพิ่มรายการ</button>
+
+            <div class="signature-container">
+                <div class="signature-box">
+                    <p>(_____________________________)</p>
+                    <p>ผู้บันทึกรายการเบิก</p>
+                </div>
+                <div class="signature-box">
+                    <p>(_____________________________)</p>
+                    <p>ผู้ตรวจสอบ</p>
+                </div>
+                <div class="signature-box">
+                    <p>(_____________________________)</p>
+                    <p>ผู้อนุมัติ</p>
+                </div>
+            </div>
+            
+            <div class="form-controls no-print">
+                <button class="button" id="printMainFormBtn">พิมพ์ใบตั้งเบิก</button>
+                <button class="button" id="saveBtn">บันทึกใบตั้งเบิก</button>
+            </div>
+
+            <div id="financialSection">
+                <div class="section-title">บันทึกรายการฝ่ายการเงิน</div>
+                <table class="doc-table">
+                    <thead>
+                        <tr>
+                            <th class="center-header">เลขที่บัญชี</th>
+                            <th class="center-header">เลขที่เช็ค</th>
+                            <th class="center-header">วันที่</th>
+                            <th class="center-header">จำนวนเงิน</th>
+                            <th class="center-header">ค่าธรรมเนียม</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><input type="text" value="-" class="editable-input input-style center-input"
+                                    id="accountNumber"></td>
+                            <td><input type="text" value="" class="editable-input input-style center-input" 
+                                    id="checkNumber"></td>
+                            <td><input type="date" value="<?= new Date().toISOString().split('T')[0] ?>" class="input-style center-input"
+                                    id="paymentDate"></td>
+                            <td><input type="text" value="0.00" class="editable-input input-style center-input"
+                                    id="paymentAmount"></td>
+                            <td><input type="text" value="-" class="editable-input input-style center-input" id="fee">
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <p>
+                    <strong>ลิงค์ใบโอน:</strong>
+                    <input type="text" id="transferLink" class="editable-input input-style" value=""
+                        oninput="generateQRCode()">
+                </p>
+                <div style="display: flex; align-items: flex-start; justify-content: space-between; margin-top: 0.5em;">
+                    <div id="qrcode" style="margin-top:10px; text-align: left;"></div>
+                    <div style="text-align: right;">
+                        .................................................<br>
+                        วันที่....................................<br>
+                        ผู้บันทึกข้อมูล : <span id="currentUser"></span>
+                    </div>
+                </div>
+
+                <div class="form-controls no-print">
+                    <button class="button" id="printFinancialSectionBtn">พิมพ์รายการฝ่ายการเงิน</button>
+                    <button class="button" id="saveFinancialBtn">บันทึกรายการฝ่ายการเงิน</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Tab: Claim List -->
+        <div id="claimList" class="tab-content">
+            <h2>รายการใบตั้งเบิก</h2>
+            
+            <div class="section-title">ค้นหาใบตั้งเบิก</div>
+            <div class="form-container">
+                <div>
+                    <p><strong>เลขที่เอกสาร:</strong>
+                        <input type="text" id="searchDocumentNumber" class="editable-input input-style">
+                    </p>
+                    <p><strong>ประเภทงาน/รายจ่าย:</strong>
+                        <select id="searchExpenseType" class="editable-input input-style">
+                            <option value="">ทั้งหมด</option>
+                            <!-- จะถูกเติมข้อมูลจาก Script -->
+                        </select>
+                    </p>
+                </div>
+                <div>
+                    <p><strong>วันที่เริ่มต้น:</strong>
+                        <input type="date" id="searchStartDate" class="input-style">
+                    </p>
+                    <p><strong>วันที่สิ้นสุด:</strong>
+                        <input type="date" id="searchEndDate" class="input-style">
+                    </p>
+                </div>
+            </div>
+            <button class="button" id="searchBtn">ค้นหา</button>
+            
+            <div class="section-title">ผลการค้นหา</div>
+            <table class="doc-table" id="claimListTable">
+                <thead>
+                    <tr>
+                        <th>เลขที่เอกสาร</th>
+                        <th>วันที่</th>
+                        <th>ประเภทรายจ่าย</th>
+                        <th>ผู้รับเงิน</th>
+                        <th>จำนวนเงิน</th>
+                        <th>สถานะ</th>
+                        <th>จัดการ</th>
+                    </tr>
+                </thead>
+                <tbody id="claimListBody">
+                    <!-- จะถูกเติมข้อมูลจาก Script -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <span id="textWidth" style="visibility: hidden; white-space: pre;"></span>
+
+    <!-- Load QR Code library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    
+    <!-- Google Apps Script client-side JavaScript -->
+    <script>
+      // บังคับให้ต้องรันผ่าน IFRAME mode ของ Google Apps Script
+      if (window.top === window.self) {
+        document.body.innerHTML = '<p style="text-align:center;margin-top:100px;font-family:sans-serif;">กรุณาเปิดหน้านี้ผ่าน Google Apps Script</p>';
+      }
+      
+      let initialData = {};
+      let currentUser = '';
+      let nextDocumentNumber = '';
+      let docBody;
+      let addRowBtn;
+      let totalAmountText;
+      let totalAmount;
+      let textWidth;
+      let rowCount = 0;
+      
+      // เรียกข้อมูลเริ่มต้นจาก Server
+      function loadInitialData() {
+        google.script.run
+          .withSuccessHandler(function(result) {
+            initialData = result;
+            currentUser = initialData.currentUser || 'ผู้ใช้งานระบบ';
+            nextDocumentNumber = initialData.nextDocumentNumber || generateDocumentNumber();
+            
+            document.getElementById('currentUser').textContent = currentUser;
+            document.getElementById('documentNumber').value = nextDocumentNumber;
+            
+            // เติมข้อมูลประเภทรายจ่าย
+            const expenseTypeSelect = document.getElementById('expenseType');
+            const searchExpenseType = document.getElementById('searchExpenseType');
+            if (initialData.expenseTypes && initialData.expenseTypes.length > 0) {
+              initialData.expenseTypes.forEach(type => {
+                const option = document.createElement('option');
+                option.value = type.name;
+                option.textContent = type.name;
+                expenseTypeSelect.appendChild(option);
+                
+                const searchOption = option.cloneNode(true);
+                searchExpenseType.appendChild(searchOption);
+              });
+            }
+            
+            // เติมข้อมูลผู้รับเงิน
+            const payeeSelect = document.getElementById('payee');
+            if (initialData.recipients && initialData.recipients.length > 0) {
+              initialData.recipients.forEach(recipient => {
+                if (recipient.active) {
+                  const option = document.createElement('option');
+                  option.value = recipient.name;
+                  option.textContent = recipient.name;
+                  option.dataset.bankAccount = `${recipient.bankName || ''} ${recipient.bankAccount || ''}`;
+                  payeeSelect.appendChild(option);
+                }
+              });
+            }
+            
+            // เติมข้อมูลโครงการ
+            const projectSelect = document.getElementById('project');
+            if (initialData.projects && initialData.projects.length > 0) {
+              initialData.projects.forEach(project => {
+                if (project.active) {
+                  const option = document.createElement('option');
+                  option.value = project.name;
+                  option.textContent = project.name;
+                  projectSelect.appendChild(option);
+                }
+              });
+            }
+            
+            // เติมข้อมูลรูปแบบการจ่าย
+            const paymentTypeSelect = document.getElementById('paymentType');
+            if (initialData.paymentMethods && initialData.paymentMethods.length > 0) {
+              initialData.paymentMethods.forEach(method => {
+                if (method.active) {
+                  const option = document.createElement('option');
+                  option.value = method.name;
+                  option.textContent = method.name;
+                  paymentTypeSelect.appendChild(option);
+                }
+              });
+            }
+            
+            // โหลดรายการใบตั้งเบิก
+            loadClaimList();
+          })
+          .withFailureHandler(function(error) {
+            console.error('Error loading initial data:', error);
+            alert('เกิดข้อผิดพลาดในการโหลดข้อมูล: ' + error);
+          })
+          .getInitialData();
+      }
+      
+      // โหลดรายการใบตั้งเบิก
+      function loadClaimList() {
+        google.script.run
+          .withSuccessHandler(function(result) {
+            if (result.success) {
+              const claimListBody = document.getElementById('claimListBody');
+              claimListBody.innerHTML = '';
+              
+              if (result.data && result.data.length > 0) {
+                result.data.forEach(claim => {
+                  const row = document.createElement('tr');
+                  
+                  // Format date
+                  const formattedDate = claim.recordDate ? new Date(claim.recordDate).toLocaleDateString('th-TH') : '-';
+                  
+                  // Format amount
+                  const formattedAmount = typeof claim.totalAmount === 'number' 
+                    ? claim.totalAmount.toLocaleString('th-TH', { minimumFractionDigits: 2 }) 
+                    : '0.00';
+                  
+                  row.innerHTML = `
+                    <td>${claim.documentNumber || '-'}</td>
+                    <td>${formattedDate}</td>
+                    <td>${claim.expenseType || '-'}</td>
+                    <td>${claim.payee || '-'}</td>
+                    <td style="text-align:right">${formattedAmount}</td>
+                    <td>${claim.status || 'รอการอนุมัติ'}</td>
+                    <td>
+                      <button onclick="viewClaim('${claim.documentNumber}')">ดู</button>
+                      <button onclick="printClaim('${claim.documentNumber}')">พิมพ์</button>
+                    </td>
+                  `;
+                  
+                  claimListBody.appendChild(row);
+                });
+              } else {
+                const row = document.createElement('tr');
+                row.innerHTML = '<td colspan="7" style="text-align:center">ไม่พบข้อมูลใบตั้งเบิก</td>';
+                claimListBody.appendChild(row);
+              }
+            } else {
+              console.error('Error loading claim list:', result.error);
+              alert('เกิดข้อผิดพลาดในการโหลดรายการใบตั้งเบิก: ' + result.error);
+            }
+          })
+          .withFailureHandler(function(error) {
+            console.error('Error loading claim list:', error);
+            alert('เกิดข้อผิดพลาดในการโหลดรายการใบตั้งเบิก: ' + error);
+          })
+          .handleReadRequest('Claims');
+      }
+      
+      // สร้างเลขที่เอกสารอัตโนมัติ
+      function generateDocumentNumber() {
+        const now = new Date();
+        const year = now.getFullYear().toString().substring(2);
+        const month = (now.getMonth() + 1).toString().padStart(2, '0');
+        const random = Math.floor(Math.random() * 9000 + 1000);
+        return `DBM${year}${month}${random}`;
+      }
+      
+      // ค้นหาใบตั้งเบิก
+      function searchClaims() {
+        const docNumber = document.getElementById('searchDocumentNumber').value;
+        const expenseType = document.getElementById('searchExpenseType').value;
+        const startDate = document.getElementById('searchStartDate').value;
+        const endDate = document.getElementById('searchEndDate').value;
+        
+        // TODO: Implement search logic using Google Apps Script
+        google.script.run
+          .withSuccessHandler(function(result) {
+            if (result.success) {
+              // Update claim list with search results
+              // Similar to loadClaimList but with filtered data
+            } else {
+              alert('เกิดข้อผิดพลาดในการค้นหา: ' + result.error);
+            }
+          })
+          .withFailureHandler(function(error) {
+            alert('เกิดข้อผิดพลาดในการค้นหา: ' + error);
+          })
+          .searchClaims({
+            documentNumber: docNumber,
+            expenseType: expenseType,
+            startDate: startDate,
+            endDate: endDate
+          });
+      }
+      
+      // Event handlers
+      document.addEventListener('DOMContentLoaded', function() {
+        docBody = document.getElementById('docBody');
+        addRowBtn = document.getElementById('addRowBtn');
+        totalAmountText = document.getElementById('totalAmountText');
+        totalAmount = document.getElementById('totalAmount');
+        textWidth = document.getElementById('textWidth');
+        
+        // Tab switching
+        const tabs = document.querySelectorAll('.tab');
+        tabs.forEach(tab => {
+          tab.addEventListener('click', function() {
+            const tabId = this.getAttribute('data-tab');
+            
+            // Remove active class from all tabs and contents
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            
+            // Add active class to clicked tab and corresponding content
+            this.classList.add('active');
+            document.getElementById(tabId).classList.add('active');
+          });
+        });
+        
+        // Add row button
+        addRowBtn.addEventListener('click', function() {
+          const newRow = createRow();
+          docBody.appendChild(newRow);
+          updateRowNumbers();
+          adjustAllInputSizes();
+        });
+        
+        // Save button
+        document.getElementById('saveBtn').addEventListener('click', function() {
+          if (validateForm()) {
+            saveClaim();
+          }
+        });
+        
+        // Print buttons
+        document.getElementById('printMainFormBtn').addEventListener('click', function() {
+          if (validateForm()) {
+            printMainForm();
+          }
+        });
+        
+        document.getElementById('printFinancialSectionBtn').addEventListener('click', function() {
+          printFinancialSection();
+        });
+        
+        // Save financial data button
+        document.getElementById('saveFinancialBtn').addEventListener('click', function() {
+          saveFinancialData();
+        });
+        
+        // Search button
+        document.getElementById('searchBtn').addEventListener('click', function() {
+          searchClaims();
+        });
+        
+        // Payee change handler - update bank account
+        document.getElementById('payee').addEventListener('change', function() {
+          const selectedOption = this.options[this.selectedIndex];
+          document.getElementById('bankAccount').value = selectedOption.dataset.bankAccount || '';
+        });
+        
+        // Create initial empty row
+        addRowBtn.click();
+        
+        // Generate QR code
+        generateQRCode();
+        
+        // Load initial data from Google Apps Script
+        loadInitialData();
+      });
+      
+      function validateForm() {
+        const expenseType = document.getElementById('expenseType').value;
+        const payee = document.getElementById('payee').value;
+        const project = document.getElementById('project').value;
+        const documentNumber = document.getElementById('documentNumber').value;
+        
+        if (!expenseType) {
+          alert('กรุณาเลือกประเภทงาน/รายจ่าย');
+          return false;
+        }
+        
+        if (!payee) {
+          alert('กรุณาเลือกผู้รับเงิน');
+          return false;
+        }
+        
+        if (!project) {
+          alert('กรุณาเลือกโครงการ');
+          return false;
+        }
+        
+        if (!documentNumber) {
+          alert('กรุณาระบุเลขที่เอกสาร');
+          return false;
+        }
+        
+        return true;
+      }
+      
+      function saveClaim() {
+        // Collect expense items
+        const expenses = [];
+        document.querySelectorAll('#docBody tr').forEach(row => {
+          const description = row.querySelector('.description-input').value;
+          const amountStr = row.querySelector('.amount-input').value.replace(/,/g, '');
+          const amount = parseFloat(amountStr) || 0;
+          
+          if (description || amount > 0) {
+            expenses.push({ description, amount });
+          }
+        });
+        
+        // Collect form data
+        const formData = {
+          documentNumber: document.getElementById('documentNumber').value,
+          recordDate: document.getElementById('documentDate').value,
+          referenceNumber: document.getElementById('referenceDocument').value,
+          dueDate: document.getElementById('dueDate').value,
+          expenseType: document.getElementById('expenseType').value,
+          payee: document.getElementById('payee').value,
+          bankAccount: document.getElementById('bankAccount').value,
+          project: document.getElementById('project').value,
+          paymentMethod: document.getElementById('paymentType').value,
+          note: document.getElementById('note').value,
+          recorder: currentUser,
+          status: 'รอการอนุมัติ',
+          totalAmount: parseFloat(document.getElementById('totalAmount').textContent.replace(/,/g, '')) || 0,
+          expenses: expenses
+        };
+        
+        // Save to Google Sheets via Google Apps Script
+        google.script.run
+          .withSuccessHandler(function(result) {
+            if (result.success) {
+              // Show success message
+              const saveMessage = document.getElementById('saveMessage');
+              saveMessage.style.display = 'block';
+              saveMessage.textContent = 'บันทึกข้อมูลเรียบร้อยแล้ว';
+              
+              // Hide message after 3 seconds
+              setTimeout(function() {
+                saveMessage.style.display = 'none';
+              }, 3000);
+              
+              // Generate new document number for next claim
+              document.getElementById('documentNumber').value = generateDocumentNumber();
+              
+              // Clear form
+              clearForm();
+              
+              // Reload claim list
+              loadClaimList();
+            } else {
+              alert('เกิดข้อผิดพลาดในการบันทึกข้อมูล: ' + result.error);
+            }
+          })
+          .withFailureHandler(function(error) {
+            alert('เกิดข้อผิดพลาดในการบันทึกข้อมูล: ' + error);
+          })
+          .handleCreateRequest('Claims', formData);
+      }
+      
+      function saveFinancialData() {
+        const documentNumber = document.getElementById('documentNumber').value;
+        
+        if (!documentNumber) {
+          alert('กรุณาเลือกใบตั้งเบิกก่อนบันทึกข้อมูลการเงิน');
+          return;
+        }
+        
+        const financialData = {
+          documentNumber: documentNumber,
+          accountNumber: document.getElementById('accountNumber').value,
+          checkNumber: document.getElementById('checkNumber').value,
+          paymentDate: document.getElementById('paymentDate').value,
+          paymentAmount: parseFloat(document.getElementById('paymentAmount').value.replace(/,/g, '')) || 0,
+          fee: document.getElementById('fee').value,
+          transferLink: document.getElementById('transferLink').value,
+          financialRecorder: currentUser,
+          financialRecordDate: new Date().toISOString().split('T')[0]
+        };
+        
+        // Save to Google Sheets via Google Apps Script
+        google.script.run
+          .withSuccessHandler(function(result) {
+            if (result.success) {
+              // Show success message
+              const saveMessage = document.getElementById('saveMessage');
+              saveMessage.style.display = 'block';
+              saveMessage.textContent = 'บันทึกข้อมูลการเงินเรียบร้อยแล้ว';
+              
+              // Hide message after 3 seconds
+              setTimeout(function() {
+                saveMessage.style.display = 'none';
+              }, 3000);
+              
+              // Reload claim list
+              loadClaimList();
+            } else {
+              alert('เกิดข้อผิดพลาดในการบันทึกข้อมูลการเงิน: ' + result.error);
+            }
+          })
+          .withFailureHandler(function(error) {
+            alert('เกิดข้อผิดพลาดในการบันทึกข้อมูลการเงิน: ' + error);
+          })
+          .updateFinancialData(financialData);
+      }
+      
+      function clearForm() {
+        // Clear expense items
+        docBody.innerHTML = '';
+        addRowBtn.click();
+        
+        // Clear form fields except document number
+        document.getElementById('expenseType').selectedIndex = 0;
+        document.getElementById('payee').selectedIndex = 0;
+        document.getElementById('bankAccount').value = '';
+        document.getElementById('project').selectedIndex = 0;
+        document.getElementById('paymentType').selectedIndex = 0;
+        document.getElementById('referenceDocument').value = '';
+        document.getElementById('note').value = '';
+        
+        // Reset dates to today
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('documentDate').value = today;
+        document.getElementById('dueDate').value = today;
+        
+        // Update UI
+        updateTotalAmount();
+      }
+      
+      function viewClaim(documentNumber) {
+        // Load claim data from Google Sheets
+        google.script.run
+          .withSuccessHandler(function(result) {
+            if (result.success && result.data) {
+              const claim = result.data[0]; // Assume we get the first matching claim
+              
+              if (claim) {
+                // Switch to claim form tab
+                document.querySelector('.tab[data-tab="claimForm"]').click();
+                
+                // Fill form with claim data
+                document.getElementById('documentNumber').value = claim.documentNumber || '';
+                document.getElementById('documentDate').value = claim.recordDate || '';
+                document.getElementById('referenceDocument').value = claim.referenceNumber || '';
+                document.getElementById('dueDate').value = claim.dueDate || '';
+                
+                // Select options
+                selectOption('expenseType', claim.expenseType);
+                selectOption('payee', claim.payee);
+                document.getElementById('bankAccount').value = claim.bankAccount || '';
+                selectOption('project', claim.project);
+                selectOption('paymentType', claim.paymentMethod);
+                
+                document.getElementById('note').value = claim.note || '';
+                
+                // Clear existing expense items
+                docBody.innerHTML = '';
+                
+                // Add expense items
+                if (claim.expenses && claim.expenses.length > 0) {
+                  claim.expenses.forEach(expense => {
+                    if (expense && (expense.description || expense.amount)) {
+                      const newRow = createRow();
+                      docBody.appendChild(newRow);
+                      
+                      const descriptionInput = newRow.querySelector('.description-input');
+                      const amountInput = newRow.querySelector('.amount-input');
+                      
+                      descriptionInput.value = expense.description || '';
+                      amountInput.value = typeof expense.amount === 'number' 
+                        ? expense.amount.toLocaleString('th-TH', { minimumFractionDigits: 2 })
+                        : '0.00';
+                    }
+                  });
+                } else {
+                  // Add one empty row
+                  addRowBtn.click();
+                }
+                
+                // Update row numbers and total
+                updateRowNumbers();
+                updateTotalAmount();
+                
+                // Fill financial data if available
+                if (claim.financialData) {
+                  document.getElementById('accountNumber').value = claim.financialData.accountNumber || '-';
+                  document.getElementById('checkNumber').value = claim.financialData.checkNumber || '';
+                  document.getElementById('paymentDate').value = claim.financialData.paymentDate || '';
+                  document.getElementById('paymentAmount').value = typeof claim.financialData.paymentAmount === 'number'
+                    ? claim.financialData.paymentAmount.toLocaleString('th-TH', { minimumFractionDigits: 2 })
+                    : '0.00';
+                  document.getElementById('fee').value = claim.financialData.fee || '-';
+                  document.getElementById('transferLink').value = claim.financialData.transferLink || '';
+                  generateQRCode();
+                }
+              } else {
+                alert('ไม่พบข้อมูลใบตั้งเบิกเลขที่ ' + documentNumber);
+              }
+            } else {
+              alert('เกิดข้อผิดพลาดในการโหลดข้อมูลใบตั้งเบิก: ' + (result.error || 'ไม่พบข้อมูล'));
+            }
+          })
+          .withFailureHandler(function(error) {
+            alert('เกิดข้อผิดพลาดในการโหลดข้อมูลใบตั้งเบิก: ' + error);
+          })
+          .getClaim(documentNumber);
+      }
+      
+      function selectOption(selectId, value) {
+        const select = document.getElementById(selectId);
+        for (let i = 0; i < select.options.length; i++) {
+          if (select.options[i].value === value) {
+            select.selectedIndex = i;
+            break;
+          }
+        }
+      }
+      
+      function printClaim(documentNumber) {
+        viewClaim(documentNumber);
+        setTimeout(function() {
+          printMainForm();
+        }, 500);
+      }
+      
+      function printMainForm() {
+        window.print();
+      }
+      
+      function printFinancialSection() {
+        const financialSection = document.getElementById('financialSection');
+        const originalContents = document.body.innerHTML;
+        
+        document.body.innerHTML = financialSection.innerHTML;
+        window.print();
+        document.body.innerHTML = originalContents;
+        
+        // Re-attach event listeners
+        document.dispatchEvent(new Event('DOMContentLoaded'));
+      }
+      
+      function createRow() {
+        rowCount++;
+        const newRow = document.createElement("tr");
+        newRow.setAttribute("data-id", rowCount);
+
+        newRow.innerHTML = `
+          <td style="text-align:center;">${rowCount}</td>
+          <td>
+              <input type="text" id="description_${rowCount}" placeholder="ระบุรายการ"
+                  class="description-input input-style">
+          </td>
+          <td>
+              <input type="text" id="amount_${rowCount}" placeholder="จำนวนเงิน" class="amount-input input-style">
+          </td>
+          <td><button onclick="removeRow(${rowCount})">ลบ</button></td>
+        `;
+
+        const descriptionInput = newRow.querySelector(".description-input");
+        const amountInput = newRow.querySelector(".amount-input");
+
+        descriptionInput.addEventListener("input", function() {
+          adjustInputSize(this);
+        });
+        
+        amountInput.addEventListener("blur", function() {
+          formatAmount(this);
+        });
+
+        return newRow;
+      }
+      
+      function removeRow(rowId) {
+        const row = document.querySelector(`tr[data-id='${rowId}']`);
+        if (row) {
+          row.remove();
+          updateRowNumbers();
+          updateTotalAmount();
+        }
+      }
+      
+      function updateRowNumbers() {
+        const rows = document.querySelectorAll("#docBody tr");
+        rowCount = 0;
+        rows.forEach((row, index) => {
+          rowCount = index + 1;
+          row.setAttribute("data-id", rowCount);
+          row.children[0].textContent = rowCount;
+          
+          const descriptionInput = row.querySelector(".description-input");
+          const amountInput = row.querySelector(".amount-input");
+          const removeButton = row.querySelector("button");
+
+          descriptionInput.id = `description_${rowCount}`;
+          amountInput.id = `amount_${rowCount}`;
+          removeButton.setAttribute("onclick", `removeRow(${rowCount})`);
+        });
+      }
+      
+      function updateTotalAmount() {
+        let totalAmountValue = 0;
+        document.querySelectorAll("#docBody tr").forEach(row => {
+          const amountInput = row.querySelector(".amount-input");
+          if (amountInput) {
+            totalAmountValue += parseFloat(amountInput.value.replace(/,/g, '')) || 0;
+          }
+        });
+
+        totalAmount.textContent = formatNumber(totalAmountValue.toFixed(2));
+        totalAmountText.textContent = "(" + numberToThaiText(totalAmountValue) + ")";
+      }
+      
+      function adjustInputSize(input) {
+        textWidth.innerText = input.value.trim() || input.placeholder;
+        // Add padding and border width to the calculation
+        const padding = 4;
+        const borderWidth = 2;
+        input.style.width = textWidth.offsetWidth + padding + borderWidth + 'px';
+      }
+
+      function adjustAllInputSizes() {
+        const inputs = document.querySelectorAll('.editable-input');
+        inputs.forEach(input => adjustInputSize(input));
+      }
+
+      function formatAmount(input) {
+        let value = input.value.replace(/,/g, '');
+        if (!isNaN(value) && value.trim() !== '') {
+          input.value = formatNumber(parseFloat(value).toFixed(2));
+        } else {
+          input.value = '';
+        }
+        updateTotalAmount();
+      }
+
+      function formatNumber(number) {
+        return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+      }
+      
+      function numberToThaiText(number) {
+        const numText = ["ศูนย์", "หนึ่ง", "สอง", "สาม", "สี่", "ห้า", "หก", "เจ็ด", "แปด", "เก้า"];
+        const unitText = ["", "สิบ", "ร้อย", "พัน", "หมื่น", "แสน", "ล้าน"];
+        let bahtText = "";
+        let numberStr = Math.floor(number).toString();
+        let decimalPart = Math.round((number - Math.floor(number)) * 100);
+        let len = numberStr.length;
+
+        for (let i = 0; i < len; i++) {
+          let digit = parseInt(numberStr[i]);
+          let unit = len - i - 1;
+          if (digit !== 0) {
+            if (unit === 1 && digit === 1) {
+              bahtText += "สิบ";
+            } else if (unit === 1 && digit === 2) {
+              bahtText += "ยี่สิบ";
+            } else {
+              bahtText += numText[digit] + unitText[unit];
+            }
+          }
+        }
+
+        bahtText += "บาท";
+        if (decimalPart > 0) {
+          bahtText += " " + numText[decimalPart] + "สตางค์";
+        } else {
+          bahtText += "ถ้วน";
+        }
+
+        return bahtText;
+      }
+      
+      function generateQRCode() {
+        const qrcodeDiv = document.getElementById('qrcode');
+        const link = document.getElementById('transferLink').value;
+
+        qrcodeDiv.innerHTML = ""; // Clear previous QR code
+
+        if (link) {
+          new QRCode(qrcodeDiv, {
+            text: link,
+            width: 128,
+            height: 128,
+            colorDark: "#000000",
+            colorLight: "#ffffff",
+            correctLevel: QRCode.CorrectLevel.H
+          });
+        } else {
+          qrcodeDiv.innerText = "ไม่มีลิงค์เอกสาร";
+        }
+      }
+    </script>
+</body>
+
+</html>
